@@ -1,38 +1,80 @@
 import pandas as pd
 import numpy as np
 --------------------------------------------------------------------------------------------------------------------------
+# Note: functions and variables cannot have the same name; e.g. variable: energy & function: energy()
+# Load all three files in the beginning
+def load_energy():
+    # Load energy file, skip header; exclude footer and unnecessary columns; rename columns
+    energy = (pd.read_excel('assets/Energy Indicators.xls',skiprows=17) 
+             .loc[:(244-18),['Unnamed: 1','Petajoules','Gigajoules','%']]
+             .rename(columns={'Unnamed: 1':'Country', 'Petajoules':'Energy Supply',
+                              'Gigajoules':'Energy Supply per Capita','%':'% Renewable'})
+              # Replace missing data with NaN (done before the converting step, or '...' would also be multiplied by 1000000)
+             .replace(to_replace='...', value=np.nan))
+    # Convert Energy Supply to gigajoules
+    energy['Energy Supply'] *=  1000000
+    # Rename countries mentioned
+    energy['Country'] = energy['Country'].replace({"Republic of Korea": "South Korea",
+                               "United States of America": "United States",
+                               "United Kingdom of Great Britain and Northern Ireland": "United Kingdom",
+                               "China, Hong Kong Special Administrative Region": "Hong Kong"})
+    # Remove "()" in countries
+    energy['Country'] = energy['Country'].replace(to_replace=' \(.+\)',value='', regex=True)
+    return energy
+
+def load_GDP():
+    # Load GDP file, skip header; drop unnecessary columns; rename column ('Country Name' -> 'Country')
+    GDP = (pd.read_csv('assets/world_bank.csv',skiprows=4)
+           .drop(['Indicator Name','Indicator Code','Country Code'],axis=1)
+           .rename(columns={'Country Name':'Country'}))
+    # Rename countries mentioned
+    GDP['Country'] = GDP['Country'].replace({"Korea, Rep.": "South Korea", 
+                                             "Iran, Islamic Rep.": "Iran",
+                                             "Hong Kong SAR, China": "Hong Kong"})
+    return GDP
+
+def load_ScimEn():
+    # Load final file
+    ScimEn = pd.read_excel('assets/scimagojr-3.xlsx')
+    return ScimEn
+--------------------------------------------------------------------------------------------------------------------------
 ### Q1
-# Load energy file, skip header; exclude footer and unnecessary columns; rename columns
-energy = (pd.read_excel('assets/Energy Indicators.xls',skiprows=17) 
-         .loc[:(244-18),['Unnamed: 1','Petajoules','Gigajoules','%']]
-         .rename(columns={'Unnamed: 1':'Country', 'Petajoules':'Energy Supply',
-                          'Gigajoules':'Energy Supply per Capita','%':'% Renewable'})
-          # Replace missing data with NaN (done before the converting step, or '...' would also be multiplied by 1000000)
-         .replace(to_replace='...', value=np.nan))
-# Convert Energy Supply to gigajoules
-energy['Energy Supply'] *=  1000000
-# Rename countries mentioned
-energy['Country'] = energy['Country'].replace({"Republic of Korea": "South Korea",
-                           "United States of America": "United States",
-                           "United Kingdom of Great Britain and Northern Ireland": "United Kingdom",
-                           "China, Hong Kong Special Administrative Region": "Hong Kong"})
-# Remove "()" in countries
-energy['Country'] = energy['Country'].replace(to_replace=' \(.+\)',value='', regex=True)
+def answer_one():
+    energy, GDP, ScimEn = load_energy(), load_GDP(), load_ScimEn()
+    # Merge ScimEn(Rank 1-15) with energy first
+    ScimEn_energy = pd.merge(ScimEn[ScimEn['Rank'].isin(range(1,16))], energy, on='Country')
 
-# Load GDP file, skip header; drop unnecessary columns
-GDP = pd.read_csv('assets/world_bank.csv',skiprows=4).drop(['Indicator Name','Indicator Code','Country Code'],axis=1)
-# Rename countries mentioned
-GDP['Country Name'] = GDP['Country Name'].replace({"Korea, Rep.": "South Korea", 
-                                                   "Iran, Islamic Rep.": "Iran",
-                                                   "Hong Kong SAR, China": "Hong Kong"})
-# Load final file
-ScimEn = pd.read_excel('assets/scimagojr-3.xlsx')
-
-# Merge ScimEn(Rank 1-15) with energy first
-ScimEn_energy = pd.merge(ScimEn[ScimEn['Rank'].isin(range(1,16))], energy, on='Country')
-
-# Merge above df with GDP(2006-2015); set 'Country' as index, drop duplicate column 'Country Name'
-yrs = [str(yr) for yr in range(2006,2016)]
-df_merge = (pd.merge(ScimEn_energy, GDP[['Country Name']+yrs], left_on='Country', right_on='Country Name').set_index('Country')
- .drop('Country Name', axis = 1))
-df_merge
+    # Merge above df with GDP(2006-2015); set 'Country' as index, drop duplicate column 'Country Name'
+    yrs = [str(yr) for yr in range(2006,2016)]
+    df_merge = pd.merge(ScimEn_energy, GDP[['Country']+yrs], on='Country').set_index('Country')
+    
+    return df_merge
+    raise NotImplementedError()
+--------------------------------------------------------------------------------------------------------------------------
+### Q2
+# Note: the question has specified " When you joined the datasets, BUT BEFORE you reduced this to the top 15 items, how many entries did you lose?"
+# so do not need to remove any row while merging
+def answer_two():
+    energy, GDP, ScimEn = load_energy(), load_GDP(), load_ScimEn()
+    # Inner Merge
+    temp = pd.merge(ScimEn, energy, on='Country')
+    df_inner = pd.merge(temp, GDP, on='Country')
+    
+    # Outer Merge
+    temp2 = pd.merge(ScimEn, energy, how='outer', on='Country')
+    df_outer = pd.merge(temp2, GDP, how='outer', on='Country')
+     
+    return len(df_outer) - len(df_inner)
+    raise NotImplementedError()
+# answer_two()
+--------------------------------------------------------------------------------------------------------------------------
+### Q3
+def answer_three():
+    # YOUR CODE HERE
+    yrs = [str(yr) for yr in range(2006,2016)]
+    GDP_only = answer_one()[yrs]
+    avgGDP = GDP_only.mean(axis=1).sort_values(ascending=False).rename('avgGDP')
+    return avgGDP
+    raise NotImplementedError()
+#answer_three()
+--------------------------------------------------------------------------------------------------------------------------
