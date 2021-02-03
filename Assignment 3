@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-
+--------------------------------------------------------------------------------------------------------------------------
+### Q1
 # Load energy file, skip header; exclude footer and unnecessary columns; rename columns
 energy = (pd.read_excel('assets/Energy Indicators.xls',skiprows=17) 
          .loc[:(244-18),['Unnamed: 1','Petajoules','Gigajoules','%']]
