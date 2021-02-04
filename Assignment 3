@@ -216,7 +216,23 @@ ContinentDict  = {'China':'Asia', 'United States':'North America', 'Japan':'Asia
                   'Brazil':'South America'}
 This function should return a DataFrame with index named Continent ['Asia', 'Australia', 'Europe', 'North America', 'South America'] and columns ['size', 'sum', 'mean', 'std']
 ----------------------------------------------------------------------------------------
-
+def answer_eleven():
+    # YOUR CODE HERE
+    ContinentDict  = {'China':'Asia', 'United States':'North America', 'Japan':'Asia', 'United Kingdom':'Europe', 
+                      'Russian Federation':'Europe', 'Canada':'North America', 'Germany':'Europe', 'India':'Asia',
+                      'France':'Europe', 'South Korea':'Asia', 'Italy':'Europe', 'Spain':'Europe', 'Iran':'Asia',
+                      'Australia':'Australia', 'Brazil':'South America'}
+    top15 = answer_one()
+    top15['Population'] = top15['Energy Supply'] / top15['Energy Supply per Capita']
+    top15['Continent'] = top15.index.map(ContinentDict)
+    
+    # Note: If there's no column selected (i.e. ['Population']) after groupby function, the result will become multiindex (level 0 - Population, level 1 - size,sum,...)
+    # Solution: Group your dataframe by Continent, select the population estimate column, and use agg method on it and pass list of functions that you'll perform.
+    # ref: https://www.coursera.org/learn/python-data-analysis/discussions/weeks/3/threads/t1uMKTLtEeuv2w6raM0B0w/replies/9cJmczLwEeuv2w6raM0B0w    
+    return top15.groupby('Continent')['Population'].agg(['size', 'sum', 'mean', 'std'])
+    
+    raise NotImplementedError()
+# answer_eleven()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Q12
 Cut % Renewable into 5 bins. Group Top15 by the Continent, as well as these new % Renewable bins. How many countries are in each of these groups?
