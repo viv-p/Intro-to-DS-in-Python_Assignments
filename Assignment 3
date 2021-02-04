@@ -238,12 +238,34 @@ def answer_eleven():
 Cut % Renewable into 5 bins. Group Top15 by the Continent, as well as these new % Renewable bins. How many countries are in each of these groups?
 This function should return a Series with a MultiIndex of Continent, then the bins for % Renewable. Do not include groups with no countries.
 ----------------------------------------------------------------------------------------
-
+def answer_twelve():
+    # YOUR CODE HERE
+    top15 = answer_one()
+    ContinentDict  = {'China':'Asia', 'United States':'North America', 'Japan':'Asia', 'United Kingdom':'Europe', 
+                      'Russian Federation':'Europe', 'Canada':'North America', 'Germany':'Europe', 'India':'Asia',
+                      'France':'Europe', 'South Korea':'Asia', 'Italy':'Europe', 'Spain':'Europe', 'Iran':'Asia',
+                      'Australia':'Australia', 'Brazil':'South America'}
+    top15['Continent'] = top15.index.map(ContinentDict)
+    top15['% bin'] = pd.cut(top15['% Renewable'], 5, labels=['b'+str(i) for i in range(1,6)])
+    
+    # Note: There's no .reset_index() function for Series, so I assign the aggregated Series to a new variable in order to use .index.rename() function later on
+    s = top15.groupby(['Continent','% bin']).agg('size')
+    s.index.rename(['Continent','% Renewable'],inplace=True)
+    return s
+    
+    raise NotImplementedError()
+#answer_twelve()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Q13
 Convert the Population Estimate series to a string with thousands separator (using commas). Use all significant digits (do not round the results).
 e.g. 12345678.90 -> 12,345,678.90
 This function should return a series PopEst whose index is the country name and whose values are the population estimate string
 ----------------------------------------------------------------------------------------
-
+def answer_thirteen():
+    top15 = answer_one()
+    top15['PopEst'] = (top15['Energy Supply'] / top15['Energy Supply per Capita'])
+    # Note: Formatting number with commas can be done by using "{:,}".format(n). But it cannot be directly used on Series, so use it by .apply function
+    return top15['PopEst'].apply(lambda n: "{:,}".format(n))
+    raise NotImplementedError()
+answer_thirteen()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
