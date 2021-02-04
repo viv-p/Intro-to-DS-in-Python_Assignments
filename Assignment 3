@@ -180,27 +180,54 @@ def answer_eight():
 # answer_eight()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Q9
-
+Create a column that estimates the number of citable documents per person. What is the correlation between the number of citable documents per capita and the energy 
+supply per capita? Use the .corr() method, (Pearson's correlation).
+This function should return a single number.
 ----------------------------------------------------------------------------------------
-
+def answer_nine():
+    # YOUR CODE HERE
+    corr_df = answer_one()
+    corr_df['Population'] = corr_df['Energy Supply'] / corr_df['Energy Supply per Capita']
+    corr_df['Citable documents Per Capita'] = corr_df['Citable documents'] / corr_df['Population']
+    corr_df = corr_df[['Citable documents Per Capita','Energy Supply per Capita']]
+    return corr_df.corr(method='pearson').iloc[0,1]
+    raise NotImplementedError()
+# answer_nine()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Q10
-
+Create a new column with a 1 if the country's % Renewable value is at or above the median for all countries in the top 15, and a 0 if the country's % Renewable value 
+is below the median.
+This function should return a series named HighRenew whose index is the country name sorted in ascending order of rank.
 ----------------------------------------------------------------------------------------
-
+def answer_ten():
+    # YOUR CODE HERE
+    top15 = answer_one()
+    top15['HighRenew'] = top15['% Renewable'].apply(lambda v: 1 if v >= top15['% Renewable'].median() else 0)
+    return top15['HighRenew']
+    raise NotImplementedError()
+#answer_ten()
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Q11
+Use the following dictionary to group the Countries by Continent, then create a DataFrame that displays the sample size (the number of countries in each continent bin), 
+and the sum, mean, and std deviation for the estimated population of each country.
 
+ContinentDict  = {'China':'Asia', 'United States':'North America', 'Japan':'Asia', 'United Kingdom':'Europe', 'Russian Federation':'Europe', 'Canada':'North America', 
+                  'Germany':'Europe', 'India':'Asia', 'France':'Europe', 'South Korea':'Asia', 'Italy':'Europe', 'Spain':'Europe', 'Iran':'Asia','Australia':'Australia', 
+                  'Brazil':'South America'}
+This function should return a DataFrame with index named Continent ['Asia', 'Australia', 'Europe', 'North America', 'South America'] and columns ['size', 'sum', 'mean', 'std']
 ----------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Q12
-
+Cut % Renewable into 5 bins. Group Top15 by the Continent, as well as these new % Renewable bins. How many countries are in each of these groups?
+This function should return a Series with a MultiIndex of Continent, then the bins for % Renewable. Do not include groups with no countries.
 ----------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Q13
-
+Convert the Population Estimate series to a string with thousands separator (using commas). Use all significant digits (do not round the results).
+e.g. 12345678.90 -> 12,345,678.90
+This function should return a series PopEst whose index is the country name and whose values are the population estimate string
 ----------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
