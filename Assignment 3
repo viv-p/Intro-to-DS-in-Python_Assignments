@@ -264,7 +264,7 @@ This function should return a series PopEst whose index is the country name and 
 def answer_thirteen():
     top15 = answer_one()
     top15['PopEst'] = (top15['Energy Supply'] / top15['Energy Supply per Capita'])
-    # Note: Formatting number with commas can be done by using "{:,}".format(n). But it cannot be directly used on Series, so use it by .apply function
+    # Note: Formatting number with commas can be done by using "{:,}".format(n). But it cannot be directly used on Series, so use it with .apply function
     return top15['PopEst'].apply(lambda n: "{:,}".format(n))
     raise NotImplementedError()
 answer_thirteen()
